@@ -1,5 +1,15 @@
 package com.upes.lostfound.controller;
 
+import java.time.LocalDateTime;
+import java.util.Random;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.upes.lostfound.dto.LoginRequest;
 import com.upes.lostfound.dto.RegisterRequest;
 import com.upes.lostfound.dto.VerifyOtpRequest;
@@ -8,13 +18,10 @@ import com.upes.lostfound.model.User;
 import com.upes.lostfound.repository.OtpRepository;
 import com.upes.lostfound.repository.UserRepository;
 import com.upes.lostfound.util.JwtService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Random;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -24,8 +31,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final OtpRepository otpRepository;
     private final JwtService jwtService;
-
-
 
     @PostMapping("/register")
     public String register(@RequestBody RegisterRequest request) {
@@ -58,7 +63,6 @@ public class AuthController {
         return "User registered. OTP: " + generatedOtp; // temporary (for testing)
     }
 
-
     @PostMapping("/verify-otp")
     public String verifyOtp(@RequestBody VerifyOtpRequest request) {
 
@@ -85,7 +89,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public Object login(@RequestBody LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,9 +108,8 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getEmail());
 
-        return token;
+        return java.util.Map.of("token", token);
+
     }
-
-
 
 }

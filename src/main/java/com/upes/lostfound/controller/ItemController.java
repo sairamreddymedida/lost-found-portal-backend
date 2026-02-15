@@ -1,5 +1,15 @@
 package com.upes.lostfound.controller;
 
+import java.time.LocalDateTime;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.upes.lostfound.dto.CreateItemRequest;
 import com.upes.lostfound.model.Item;
 import com.upes.lostfound.model.RetrievalRequest;
@@ -7,11 +17,8 @@ import com.upes.lostfound.model.User;
 import com.upes.lostfound.repository.ItemRepository;
 import com.upes.lostfound.repository.RetrievalRequestRepository;
 import com.upes.lostfound.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/items")
@@ -21,7 +28,6 @@ public class ItemController {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final RetrievalRequestRepository retrievalRequestRepository;
-
 
     @GetMapping("/public")
     public Object getAllActiveItems() {
@@ -66,7 +72,6 @@ public class ItemController {
         return "Retrieval request submitted successfully!";
     }
 
-
     @PostMapping
     public String createItem(@RequestBody CreateItemRequest request) {
 
@@ -86,6 +91,9 @@ public class ItemController {
         item.setResolved(false);
         item.setCreatedBy(user);
         item.setCreatedAt(LocalDateTime.now());
+        if (item.getCreatedBy().getId().equals(user.getId())) {
+            return "You cannot request retrieval for your own item.";
+        }
 
         itemRepository.save(item);
 

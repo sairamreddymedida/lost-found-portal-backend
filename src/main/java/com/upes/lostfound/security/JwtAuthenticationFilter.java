@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+
 import java.util.List;
 
 @Component
@@ -37,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         String email = jwtService.extractEmail(token);
 
-        if (email != null) {
+        if (email != null && jwtService.validateToken(token)) {
 
             // 🔥 Hardcoded Admin Email
             String role;
